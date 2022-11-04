@@ -20,6 +20,7 @@ namespace BetterLoading.Stage.InitialLoad
 
         private static bool _finishedProcessing;
         private static Exception? _encounteredException;
+        public static bool WasRanBefore { get; private set; }
 
         private static StageRunStaticCctors? inst;
 
@@ -161,10 +162,16 @@ namespace BetterLoading.Stage.InitialLoad
 
         public static bool PreCallAll()
         {
+            var loadingScreen = BetterLoadingMain.GetLoadingScreen();
+            if (WasRanBefore || !loadingScreen) return true;
+
+            // No need to call it more than once, it may cause problems.
+            WasRanBefore = true;
+
             // Log.Message("Static constructors? Oh, sit down, vanilla, I'll do it myself. Starting now, at " + DateTime.Now.ToLongTimeString(), true);
             _toRun = GenTypes.AllTypesWithAttribute<StaticConstructorOnStartup>().ToList();
 
-            BetterLoadingMain.GetLoadingScreen()?.StartCoroutine(StaticConstructAll());
+            loadingScreen.StartCoroutine(StaticConstructAll());
 
             // Log.Message("[BetterLoading] Overriding LongEventHandler's toExecuteWhenFinished", true);
             
