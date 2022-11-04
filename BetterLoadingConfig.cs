@@ -16,7 +16,10 @@ public class BetterLoadingConfig
             }
         };
     }
-    
+
+    [TomlPrecedingComment("Should mod skip ctors initialization. [Recommended to keep true]")]
+    public bool SkipCtors = true;
+
     [TomlPrecedingComment("The TipCache caches information about loading screen tips so that they can be displayed as soon as the loading screen starts after the first run.")]
     public TipCacheConfig TipCache; 
 
@@ -24,7 +27,7 @@ public class BetterLoadingConfig
     public class TipCacheConfig
     {
         public static readonly int SupportedVersion = 1;
-        
+
         [TomlPrecedingComment("The internal version number of the TipCache tip blob. If this number is different from the one expected by the mod, the TipCache will be cleared.")]
         public int Version;
         [TomlPrecedingComment("The raw tip blob. NOT intended to be manually edited.")]

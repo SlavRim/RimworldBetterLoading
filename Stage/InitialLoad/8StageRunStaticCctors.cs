@@ -49,12 +49,12 @@ namespace BetterLoading.Stage.InitialLoad
 
         public override int GetMaximumProgress()
         {
-            return _toRun?.Count ?? 1;
+            return _toRun?.Count ?? 0;
         }
 
         public override bool IsCompleted()
         {
-            return _numRun == _toRun?.Count;
+            return _numRun == GetMaximumProgress();
         }
 
         public override void DoPatching(Harmony instance)
@@ -154,16 +154,26 @@ namespace BetterLoading.Stage.InitialLoad
             }
             finally
             {
-                StageRunPostFinalizeCallbacks.ShouldInterceptNext = true;
-                _finishedProcessing = true;
+                Finish();
                 // Log.Message("[BetterLoading] Lock released.");
             }
+        }
+
+        private static void Finish()
+        {
+            StageRunPostFinalizeCallbacks.ShouldInterceptNext = true;
+            _finishedProcessing = true;
         }
 
         public static bool PreCallAll()
         {
             var loadingScreen = BetterLoadingMain.GetLoadingScreen();
-            if (WasRanBefore || !loadingScreen) return true;
+
+            if (BetterLoadingConfigManager.Config.SkipCtors || WasRanBefore || !loadingScreen)
+            {
+                Finish();
+                return true;
+            }
 
             // No need to call it more than once, it may cause problems.
             WasRanBefore = true;
