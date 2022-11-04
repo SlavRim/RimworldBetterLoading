@@ -75,7 +75,7 @@ namespace BetterLoading.Stage.InitialLoad
             }
 
             _done = false;
-            
+
             //Redirect all actions via us 
             Log.Message($"[BetterLoading] Processing {___toExecuteWhenFinished.Count} post-load tasks.");
             // ___toExecuteWhenFinished = ___toExecuteWhenFinished.Select(GetExecAction).ToList();
@@ -86,37 +86,37 @@ namespace BetterLoading.Stage.InitialLoad
 
             // var last = ___toExecuteWhenFinished.Skip(2900).Take(int.MaxValue).Select(i => i.Method.DeclaringType).ToList();
             // Debug.Log($"BL Debug: last few task defining types: {last.ToStringSafeEnumerable()}");
-            
+
             // Debug.Log($"BL Debug: Looking for actions defined in type beginning with {targetTypeName}");
 
             var declaredInPDL = ___toExecuteWhenFinished.Where(task => task.Method.DeclaringType?.FullName?.StartsWith(targetTypeName) == true).ToList();
-            
+
             // Debug.Log($"BL Debug: types declared in PDL: {declaredInPDL.Select(a => a.Method).ToStringSafeEnumerable()}");
 
             var targetMethodName = VersionControl.CurrentMinor == 3 ? "b__4_3" : "b__4_2";
 
             // Log.Message($"BL Debug: Tasks defined in PDL: {string.Join(", ", declaredInPDL.Select(task => task.Method.FullDescription()))}");
-            
+
             var indexOfStaticCtor = ___toExecuteWhenFinished.IndexOf(declaredInPDL.Find(task => task.Method.Name.Contains(targetMethodName))); //The anon class that calls static ctors.
-            
+
             // Log.Message($"BL Debug: Identified target index as {indexOfStaticCtor} which maps to the action-method {___toExecuteWhenFinished[indexOfStaticCtor].Method.FullDescription()}");
 
             //Ones to execute now are the ones before the ctors
             var toExecute = ___toExecuteWhenFinished.Take(indexOfStaticCtor).ToList();
 
             _numTasksToRun = toExecute.Count;
-            
+
             //This completely skips the static constructor task, which we manually run, so get a reference to that
             var runStaticCtors = ___toExecuteWhenFinished[indexOfStaticCtor];
 
             //To execute after are the ones after the ctors - if there are any.
             var remainder = ___toExecuteWhenFinished.Skip(indexOfStaticCtor + 1).Take(int.MaxValue).ToList();
-            
+
             // Debug.Log($"BL Debug: This leaves {toExecute.Count} tasks to execute now, that one to execute in the middle, and then {remainder.Count} to execute after static ctors");
 
             LongEventHandlerMirror.ToExecuteWhenFinished = remainder;
 
-            BetterLoadingMain.LoadingScreen.StartCoroutine
+            BetterLoadingMain.GetLoadingScreen()?.StartCoroutine
             (
                 ToExecuteWhenFinishedHandler.ExecuteToExecuteWhenFinishedTheGoodVersion
                 (
@@ -141,7 +141,7 @@ namespace BetterLoading.Stage.InitialLoad
                 {
                     Thread.Sleep(200); //Wait
                 }
-                
+
                 Log.Message($"[BetterLoading] Obtained synclock, assuming post-load actions are complete and starting static constructors.");
 
                 runStaticCtors();

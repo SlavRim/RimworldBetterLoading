@@ -164,7 +164,7 @@ namespace BetterLoading.Stage.InitialLoad
             // Log.Message("Static constructors? Oh, sit down, vanilla, I'll do it myself. Starting now, at " + DateTime.Now.ToLongTimeString(), true);
             _toRun = GenTypes.AllTypesWithAttribute<StaticConstructorOnStartup>().ToList();
 
-            BetterLoadingMain.LoadingScreen.StartCoroutine(StaticConstructAll());
+            BetterLoadingMain.GetLoadingScreen()?.StartCoroutine(StaticConstructAll());
 
             // Log.Message("[BetterLoading] Overriding LongEventHandler's toExecuteWhenFinished", true);
             

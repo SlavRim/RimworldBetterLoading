@@ -18,6 +18,7 @@ namespace BetterLoading
         public static ModContentPack? ourContentPack;
         public static Harmony hInstance = new("me.samboycoding.blm");
         public static LoadingScreen? LoadingScreen;
+        public static LoadingScreen GetLoadingScreen() => LoadingScreen ? LoadingScreen : null;
 
         public static readonly Dictionary<ModContentPack, List<DllLoadError>> DllPathsThatFailedToLoad = new();
 
@@ -93,7 +94,7 @@ namespace BetterLoading
                 }
 
                 Log.Message("[BetterLoading] Injecting into main UI.");
-                LoadingScreen = Object.FindObjectOfType<Root_Entry>().gameObject.AddComponent<LoadingScreen>();
+                LoadingScreen = Object.FindObjectOfType<Root>().gameObject.AddComponent<LoadingScreen>();
                 InitLoadingScreenBackground();
 
                 hInstance.Patch(AccessTools.Method(typeof(LongEventHandler), nameof(LongEventHandler.LongEventsOnGUI)),
