@@ -1,7 +1,7 @@
 # BetterLoading
 ## A mod to make RimWorld loading screens look nice
 
-See the [steam workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=1999454301) page for a full description.
+See the [steam workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2884085308) page for a full description.
 
 If you encounter issues, I would really appreciate knowing about them. You can reach me via several methods:
 - I have a [dedicated discord server](https://discord.gg/https://discord.gg/3d8xvnBJgX) for my code projects, including BetterLoading.
