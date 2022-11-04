@@ -9,3 +9,5 @@ If you encounter issues, I would really appreciate knowing about them. You can r
 - You can DM me (Samboy#0063) on discord, I accept random friend requests.
 - You can leave a comment on the steam workshop page (though these don't get checked quite as often)
 - You can open an issue here on github, which will send a message to my discord server. 
+
+This is fork to maintain version compatibility, all credits goes to original creator.
