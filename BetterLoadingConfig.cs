@@ -18,7 +18,7 @@ public class BetterLoadingConfig
     }
 
     [TomlPrecedingComment("Should mod skip ctors initialization. [Recommended to keep true]")]
-    public bool SkipCtors = true;
+    public bool SkipCtors = false;
 
     [TomlPrecedingComment("The TipCache caches information about loading screen tips so that they can be displayed as soon as the loading screen starts after the first run.")]
     public TipCacheConfig TipCache; 

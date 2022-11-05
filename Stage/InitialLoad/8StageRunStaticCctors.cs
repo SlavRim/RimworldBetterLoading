@@ -189,11 +189,11 @@ namespace BetterLoading.Stage.InitialLoad
 
             // Log.Message($"[BetterLoading]    Got list of pending actions: {result}. Removing up to and including the static constructor call...", true);
 
-            var staticCallIdx = result.FindIndex(i => i.Method.DeclaringType?.Name == "PlayDataLoader" && i.Method.Name.Contains("m__2"));
+            var staticCallIdx = result.FindIndex(i => i.Method.DeclaringType == typeof(PlayDataLoader));
 
             // Log.Message($"[BetterLoading]        (Which is at index {staticCallIdx} of {result.Count})", true);
 
-            result = result.Skip(staticCallIdx + 1).Take(int.MaxValue).ToList(); //Remove the static constructor call
+            result = result.Skip(staticCallIdx + 1).ToList(); //Remove the static constructor call
 
             _queue = result;
 
