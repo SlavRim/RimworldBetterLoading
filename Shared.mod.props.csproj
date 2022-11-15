@@ -58,7 +58,7 @@
 	</Choose>
 
 	<PropertyGroup>
-		<TargetFramework>net472</TargetFramework>
+		<TargetFramework>net48</TargetFramework>
 		<OutputType>Library</OutputType>
 		<LangVersion>preview</LangVersion>
 		<Nullable>annotations</Nullable>
@@ -72,13 +72,21 @@
 
 		<ModBaseOutputPath>$(ProjectDir)build\</ModBaseOutputPath>
 		<ModOutputPath>$(ModBaseOutputPath)$(ModName)\</ModOutputPath>
-		<ModOutputVersion>$(ModOutputPath)$(Configuration.Replace('_DEBUG', ''))\</ModOutputVersion>
-		<ModOutputAssemblies>$(ModOutputVersion)Assemblies\</ModOutputAssemblies>
+		
+		<ModVersionPath>$(Configuration.Replace('_DEBUG', ''))\</ModVersionPath>
+		<ModOutputVersionPath>$(ModOutputPath)$(ModVersionPath)</ModOutputVersionPath>
+		
+		<ModAssembliesPath>$(ModVersionPath)Assemblies\</ModAssembliesPath>
+		<ModOutputAssembliesPath>$(ModOutputPath)$(ModAssembliesPath)</ModOutputAssembliesPath>
+		
 		<PackageOutputPath>$(ProjectDir)</PackageOutputPath>
 
 		<AssetsDir>$(ProjectDir)Assets\</AssetsDir>
 		
-		<GameModsDir>$(GameDir)Mods\</GameModsDir>
+		<GameModsPath>$(GameDir)Mods\</GameModsPath>
+		<GameModPath>$(GameModsPath)$(ModName)\</GameModPath>
+		<GameModVersionPath>$(GameModPath)$(ModVersionPath)</GameModVersionPath>
+		<GameModAssembliesPath>$(GameModPath)$(ModAssembliesPath)</GameModAssembliesPath>
 
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
 		<RunPreBuildEvent>Always</RunPreBuildEvent>
@@ -86,27 +94,33 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<UpToDateCheckInput Include="$(AssetsDir)**"/> <!-- Check for updated Assets files -->
+
+		<!-- Hide output -->
 		<Compile Remove="$(ModBaseOutputPath)**" />
 		<EmbeddedResource Remove="$(ModBaseOutputPath)**" />
 		<None Remove="$(ModBaseOutputPath)**" />
 	</ItemGroup>
-	
+
+	<!-- Check for updated Assets files -->
 	<Target Name="cleanup" AfterTargets="BeforeClean">
 		<Exec Command="rmdir /S /Q &quot;$(ModBaseOutputPath)&quot;" />
 		<Exec Command="rmdir /S /Q &quot;$(BaseOutputPath)&quot;" />
 		<Exec Command="rmdir /S /Q &quot;$(BaseIntermediateOutputPath)&quot;" />
-	</Target>
-	
-	<Target Name="prebuild" AfterTargets="PreBuildEvent">
-		<Exec Command="rmdir /S /Q &quot;$(ModOutputAssemblies)&quot;" />
-		<Exec Command="rmdir /S /Q &quot;$(GameModsDir)$(ModName)&quot;" />
+		<Exec Command="rmdir /S /Q &quot;$(GameModPath)&quot;" />
+		<Exec Command="xcopy /Y /R /S /D /I &quot;$(AssetsDir)&quot; &quot;$(ModOutputPath)&quot;" />
+		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
 	</Target>
 	
 	<Target Name="postbuild" AfterTargets="PostBuildEvent">
 		<MakeDir Directories="$(ModOutputPath)" />
-		<Exec Command="xcopy /Y /R /S /I &quot;$(AssetsDir)&quot; &quot;$(ModOutputPath)&quot;" />
-		<Exec Command="xcopy /Y /R /S /I &quot;$(OutputPath)&quot; &quot;$(ModOutputAssemblies)&quot;" />
-		<Exec Command="xcopy /Y /R /S /I &quot;$(ModOutputPath)&quot; &quot;$(GameModsDir)$(ModName)&quot;" />
+		<Exec Command="rmdir /S /Q &quot;$(ModOutputAssembliesPath)&quot;" />
+		<Exec Command="rmdir /S /Q &quot;$(GameModAssembliesPath)&quot;" />
+		<Exec Command="xcopy /Y /R /S /D /I &quot;$(OutputPath)&quot; &quot;$(ModOutputAssembliesPath)&quot;" />
+		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputAssembliesPath)&quot; &quot;$(GameModAssembliesPath)/&quot;" />
+		
+		<Exec Command="xcopy /Y /R /S /D /I &quot;$(AssetsDir)&quot; &quot;$(ModOutputPath)&quot;" />
+		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
 	</Target>
 
 	<ItemGroup>
@@ -121,6 +135,7 @@
 		<Using Include="Verse.AI" />
 		<Using Static="true"
 			   Include="Verse.TranslatorFormattedStringExtensions"/>
+		<Using Alias="Random" Include="Verse.Rand" />
 	</ItemGroup>
 
 </Project>
