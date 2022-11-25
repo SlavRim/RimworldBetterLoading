@@ -72,17 +72,17 @@
 
 		<ModBaseOutputPath>$(ProjectDir)build\</ModBaseOutputPath>
 		<ModOutputPath>$(ModBaseOutputPath)$(ModName)\</ModOutputPath>
-		
+
 		<ModVersionPath>$(Configuration.Replace('_DEBUG', ''))\</ModVersionPath>
 		<ModOutputVersionPath>$(ModOutputPath)$(ModVersionPath)</ModOutputVersionPath>
-		
+
 		<ModAssembliesPath>$(ModVersionPath)Assemblies\</ModAssembliesPath>
 		<ModOutputAssembliesPath>$(ModOutputPath)$(ModAssembliesPath)</ModOutputAssembliesPath>
-		
+
 		<PackageOutputPath>$(ProjectDir)</PackageOutputPath>
 
 		<AssetsDir>$(ProjectDir)Assets\</AssetsDir>
-		
+
 		<GameModsPath>$(GameDir)Mods\</GameModsPath>
 		<GameModPath>$(GameModsPath)$(ModName)\</GameModPath>
 		<GameModVersionPath>$(GameModPath)$(ModVersionPath)</GameModVersionPath>
@@ -94,7 +94,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<UpToDateCheckInput Include="$(AssetsDir)**"/> <!-- Check for updated Assets files -->
+		<Publicize Include="Assembly-CSharp" />
+		<PackageReference Include="Krafs.Publicizer" Version="1.0.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="$(AssetsDir)**"/>
+		<!-- Check for updated Assets files -->
 
 		<!-- Hide output -->
 		<Compile Remove="$(ModBaseOutputPath)**" />
@@ -111,14 +120,14 @@
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(AssetsDir)&quot; &quot;$(ModOutputPath)&quot;" />
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
 	</Target>
-	
+
 	<Target Name="postbuild" AfterTargets="PostBuildEvent">
 		<MakeDir Directories="$(ModOutputPath)" />
 		<Exec Command="rmdir /S /Q &quot;$(ModOutputAssembliesPath)&quot;" />
 		<Exec Command="rmdir /S /Q &quot;$(GameModAssembliesPath)&quot;" />
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(OutputPath)&quot; &quot;$(ModOutputAssembliesPath)&quot;" />
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputAssembliesPath)&quot; &quot;$(GameModAssembliesPath)/&quot;" />
-		
+
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(AssetsDir)&quot; &quot;$(ModOutputPath)&quot;" />
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
 	</Target>
