@@ -134,6 +134,14 @@
 	</Target>
 
 	<ItemGroup>
+		<ConfigurationsList Condition="'@(ConfigurationsList)' == ''" Include="$(Configurations.Split(';'))" />
+	</ItemGroup>
+
+	<Target Name="BatchBuild">
+		<MSBuild Projects="$(SolutionPath)" Properties="Configuration=%(ConfigurationsList.Identity)" Targets="Build" />
+	</Target>
+
+	<ItemGroup>
 		<Using Include="System" />
 		<Using Include="System.Reflection" />
 		<Using Include="System.Collections" />
