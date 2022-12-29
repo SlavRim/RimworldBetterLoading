@@ -64,6 +64,7 @@
 		<Nullable>annotations</Nullable>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<RootNamespace>$(MSBuildProjectName.Replace(" ", "."))</RootNamespace>
 		<NoWarn>MSB3052;CS8618;CS8603</NoWarn>
@@ -144,7 +145,7 @@
 		<Using Include="Verse.AI" />
 		<Using Static="true"
 			   Include="Verse.TranslatorFormattedStringExtensions"/>
-		<Using Alias="Random" Include="Verse.Rand" />
+		<Using Alias="RimRandom" Include="Verse.Rand" />
 	</ItemGroup>
 
 </Project>
