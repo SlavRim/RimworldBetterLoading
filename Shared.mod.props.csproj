@@ -122,7 +122,32 @@
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
 	</Target>
 
-	<Target Name="postbuild" AfterTargets="PostBuildEvent">
+	<!-- https://stackoverflow.com/a/5514808 - Batch Build -->
+	<ItemGroup>
+		<ConfigList 
+			Condition="'@(ConfigList)' == ''" 
+			Include="$(Configurations.Split(';'))" />
+	</ItemGroup>
+
+	<Choose>
+		<When Condition="'$(BatchBuild)' == ''">
+			<PropertyGroup>
+				<BatchBuild>false</BatchBuild>
+			</PropertyGroup>
+		</When>
+	</Choose>
+
+
+	<Target Name="BatchBuild">
+		<MSBuild Projects="$(ProjectPath)" 
+				 Targets="Build"
+				 Properties="Configuration=%(ConfigList.Identity);BatchBuild=true"
+                 StopOnFirstFailure="true">
+		</MSBuild>
+	</Target>
+	<!-- -->
+
+	<Target Condition="!$(BatchBuild)" Name="postbuild" AfterTargets="PostBuildEvent">
 		<MakeDir Directories="$(ModOutputPath)" />
 		<Exec Command="rmdir /S /Q &quot;$(ModOutputAssembliesPath)&quot;" />
 		<Exec Command="rmdir /S /Q &quot;$(GameModAssembliesPath)&quot;" />
@@ -131,14 +156,6 @@
 
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(AssetsDir)&quot; &quot;$(ModOutputPath)&quot;" />
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
-	</Target>
-
-	<ItemGroup>
-		<ConfigurationsList Condition="'@(ConfigurationsList)' == ''" Include="$(Configurations.Split(';'))" />
-	</ItemGroup>
-
-	<Target Name="BatchBuild">
-		<MSBuild Projects="$(SolutionPath)" Properties="Configuration=%(ConfigurationsList.Identity)" Targets="Build" />
 	</Target>
 
 	<ItemGroup>
