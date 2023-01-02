@@ -122,7 +122,7 @@
 		<Exec Command="xcopy /Y /R /S /D /I &quot;$(ModOutputPath)&quot; &quot;$(GameModPath)&quot;" />
 	</Target>
 
-	<!-- https://stackoverflow.com/a/5514808 - Batch Build -->
+	<!-- https://stackoverflow.com/a/5514808 - Batch Build/Restore -->
 	<ItemGroup>
 		<ConfigList 
 			Condition="'@(ConfigList)' == ''" 
@@ -142,6 +142,13 @@
 		<MSBuild Projects="$(ProjectPath)" 
 				 Targets="Build"
 				 Properties="Configuration=%(ConfigList.Identity);BatchBuild=true"
+                 StopOnFirstFailure="true">
+		</MSBuild>
+	</Target>
+	<Target Name="BatchRestore">
+		<MSBuild Projects="$(ProjectPath)"
+				 Targets="Restore"
+				 Properties="Configuration=%(ConfigList.Identity);BatchRestore=true"
                  StopOnFirstFailure="true">
 		</MSBuild>
 	</Target>
