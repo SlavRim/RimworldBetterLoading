@@ -25,6 +25,11 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
       with:
         vs-version: '17.2.1'
+    - name: Setup NuGet.exe for use with actions
+      uses: NuGet/setup-nuget@v1.1.1
 
-    - name: Restore & Build
-      run: cmd /c "for /R %f in (*.sln) do dotnet restore "%f" | dotnet build "%f" /t:BatchBuild -m"
+    - name: Restore
+      run: cmd /c "for /R %f in (*.sln) do nuget restore %f"
+      
+    - name: Build
+      run: cmd /c "for /R %f in (*.sln) do msbuild %f /t:BatchBuild"
