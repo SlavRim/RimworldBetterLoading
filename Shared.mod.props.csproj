@@ -68,7 +68,7 @@
 	</PropertyGroup>
 
 	<!-- Configure for versions -->
-	<PropertyGroup>
+	<PropertyGroup Condition="$(v1_3)">
 		<RefGameDir>D:\Steam\steamapps\common\RimWorld 1.3\</RefGameDir>
 		<DefineConstants>$(DefineConstants);v1_3</DefineConstants>
 	</PropertyGroup>
