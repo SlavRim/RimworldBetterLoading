@@ -24,13 +24,8 @@ jobs:
         dotnet-version: | 
           7.0.x
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-      with:
-        vs-version: '17.2.1'
-
     - name: Restore
-      run: Get-ChildItem . -Filter *.sln | Foreach-Object { msbuild $_.FullName /t:BatchRestore -m }
+      run: Get-ChildItem . -Filter *.sln | Foreach-Object { dotnet restore $_.FullName /t:BatchRestore -v n }
       
     - name: Build
-      run: Get-ChildItem . -Filter *.sln | Foreach-Object { msbuild $_.FullName /t:BatchBuild -m }
+      run: Get-ChildItem . -Filter *.sln | Foreach-Object { dotnet build $_.FullName /t:BatchBuild --no-restore -v n }
