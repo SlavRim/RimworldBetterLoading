@@ -2,9 +2,9 @@ name: .NET build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
@@ -23,9 +23,12 @@ jobs:
       with:
         dotnet-version: | 
           7.0.x
-
-    - name: Restore
-      run: Get-ChildItem . -Filter *.sln | Foreach-Object { dotnet restore $_.FullName /t:BatchRestore -v n }
-      
+    
     - name: Build
-      run: Get-ChildItem . -Filter *.sln | Foreach-Object { dotnet build $_.FullName /t:BatchBuild --no-restore -v n }
+      run: |
+        Get-ChildItem . -Filter *.sln | Foreach-Object { 
+          dotnet build $_.FullName /t:BatchBuild -v n
+          if($SuccessCodes -notcontains $LastExitCode) {
+            Exit $LastExitCode 
+          } 
+        }
