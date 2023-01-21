@@ -206,7 +206,7 @@
 	<!-- https://stackoverflow.com/a/5514808 - Batch Build/Restore -->
 
 	<Target Name="BatchBuild">
-		<Exec Command="dotnet build $(ProjectPath) -c %(ConfigurationsList.Identity) -p:BatchBuild=true -restore -v n" />
+		<Exec Command="dotnet build &quot;$(ProjectPath)&quot; -c %(ConfigurationsList.Identity) -p:BatchBuild=true -restore -v n" />
 	</Target>
 
 	<!-- Pre build, message about it -->
