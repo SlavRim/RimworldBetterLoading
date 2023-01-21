@@ -5,21 +5,22 @@
 		<Configurations>1.3_DEBUG;1.3;1.4_DEBUG;1.4</Configurations>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(AllowLocalAssemblies)' == ''">
-		<AllowLocalAssemblies>true</AllowLocalAssemblies>
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(BatchBuild)' == ''">
-		<BatchBuild>false</BatchBuild>
-	</PropertyGroup>
-	
+	<ItemGroup Condition="'@(ConfigurationsList)' == ''">
+		<ConfigurationsList Include="$(Configurations.Split(';'))" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="$(RootNamespace) == ''">
 		<RootNamespace>$(MSBuildProjectName.Replace(" ", "."))</RootNamespace>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'@(ConfigurationsList)' == ''">
-		<ConfigurationsList Include="$(Configurations.Split(';'))" />
-	</ItemGroup>
+	<PropertyGroup Condition="'$(AllowLocalAssemblies)' == ''">
+		<AllowLocalAssemblies>true</AllowLocalAssemblies>
+		<!-- Allow usage of local assemblies -->
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(BatchBuild)' == ''">
+		<BatchBuild>false</BatchBuild>
+	</PropertyGroup>
 
 	<!-- Setup environment -->
 	<PropertyGroup>
@@ -47,17 +48,30 @@
 
 
 	<!-- Setup project properties -->
-	<PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == ''">
 		<TargetFramework>net48</TargetFramework>
-		<OutputType>Library</OutputType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GenerateDocumentationFile)' == ''">
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(LangVersion)' == ''">
 		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Nullable)' == ''">
+		<Nullable>annotations</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<PackageOutputPath>$(ProjectDir)</PackageOutputPath>
 
-		<Nullable>annotations</Nullable>
 		<NoWarn>$(NoWarn);MSB3052;CS8618;CS8603</NoWarn>
 
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
@@ -70,20 +84,26 @@
 		<v1_4>$(Configuration.StartsWith('1.4'))</v1_4>
 	</PropertyGroup>
 
-	<!-- Setup game directory location -->
-	<PropertyGroup>
-		<GameDir>D:\Steam\steamapps\common\RimWorld\</GameDir>
-	</PropertyGroup>
-
 	<!-- Configure for versions -->
+	<Choose>
+		<When Condition="'$(GameDir)' == ''">
+			<PropertyGroup>
+				<GameDir>D:\Steam\steamapps\common\RimWorld 1.3\</GameDir>
+			</PropertyGroup>
+			<PropertyGroup Condition="$(v1_4)">
+				<GameDir>D:\Steam\steamapps\common\RimWorld\</GameDir>
+			</PropertyGroup>
+		</When>
+	</Choose>
+
 	<PropertyGroup Condition="$(v1_3)">
-		<RefGameDir>D:\Steam\steamapps\common\RimWorld 1.3\</RefGameDir>
 		<DefineConstants>$(DefineConstants);v1_3</DefineConstants>
 	</PropertyGroup>
+
 	<PropertyGroup Condition="$(v1_4)">
-		<RefGameDir>D:\Steam\steamapps\common\RimWorld\</RefGameDir>
 		<DefineConstants>$(DefineConstants);v1_4</DefineConstants>
 	</PropertyGroup>
+
 	<PropertyGroup Condition="$(Configuration.EndsWith('DEBUG'))">
 		<Debug>true</Debug>
 		<DebugType>full</DebugType>
@@ -92,57 +112,77 @@
 
 	<!-- Configure for OS -->
 	<Choose>
-		<When Condition="$(Linux)">
-			<PropertyGroup>
-				<GameDataDir>$(RefGameDir)RimWorldLinux_Data\</GameDataDir>
-			</PropertyGroup>
+		<When Condition="'$(GameDataDir)' == ''">
+			<Choose>
+				<When Condition="$(Linux)">
+					<PropertyGroup>
+						<GameDataDir>$(GameDir)RimWorldLinux_Data\</GameDataDir>
+					</PropertyGroup>
+				</When>
+				<When Condition="$(MacOS)">
+					<PropertyGroup>
+						<GameDataDir>$(GameDir)Contents\Resources\Data\</GameDataDir>
+					</PropertyGroup>
+				</When>
+				<When Condition="$(OS64)">
+					<PropertyGroup>
+						<GameDataDir>$(GameDir)RimWorldWin64_Data\</GameDataDir>
+					</PropertyGroup>
+				</When>
+				<Otherwise>
+					<PropertyGroup>
+						<GameDataDir>$(GameDir)RimWorldWin_Data\</GameDataDir>
+					</PropertyGroup>
+				</Otherwise>
+			</Choose>
+
 		</When>
-		<When Condition="$(MacOS)">
-			<PropertyGroup>
-				<GameDataDir>$(RefGameDir)Contents\Resources\Data\</GameDataDir>
-			</PropertyGroup>
-		</When>
-		<When Condition="$(OS64)">
-			<PropertyGroup>
-				<GameDataDir>$(RefGameDir)RimWorldWin64_Data\</GameDataDir>
-			</PropertyGroup>
-		</When>
-		<Otherwise>
-			<PropertyGroup>
-				<GameDataDir>$(RefGameDir)RimWorldWin_Data\</GameDataDir>
-			</PropertyGroup>
-		</Otherwise>
 	</Choose>
 
 	<!-- Setup mod properties -->
-	<PropertyGroup>
+	<PropertyGroup Condition="'$(ModName)' == ''">
 		<ModName>$(AssemblyName)</ModName>
+	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(ModBuildDir)' == ''">
 		<ModBuildDir>$(ProjectDir)build\</ModBuildDir>
-		<ModOutputPath>$(ModBuildDir)$(ModName)\</ModOutputPath>
+	</PropertyGroup>
 
-		<ModVersionPath>$(Configuration.Replace('_DEBUG', ''))\</ModVersionPath>
-		<ModOutputVersionPath>$(ModOutputPath)$(ModVersionPath)</ModOutputVersionPath>
-
-		<ModAssembliesPath>$(ModVersionPath)Assemblies\</ModAssembliesPath>
-		<ModOutputAssembliesPath>$(ModOutputPath)$(ModAssembliesPath)</ModOutputAssembliesPath>
-
-
+	<PropertyGroup Condition="'$(AssetsDir)' == ''">
 		<AssetsDir>$(ProjectDir)Assets\</AssetsDir>
+	</PropertyGroup>
 
+	<PropertyGroup>
+		<ModOutputPath>$(ModBuildDir)$(ModName)\</ModOutputPath>
+		<!-- build\ModName\ -->
+
+		<ModVersion>$(Configuration.Replace('_DEBUG', ''))</ModVersion>
+		<!-- Mod version (1.3..1.4) -->
+		<ModOutputVersionPath>$(ModOutputPath)$(ModVersion)\</ModOutputVersionPath>
+		<!-- build\ModName\(1.3..1.4)\ -->
+
+		<ModAssembliesPath>$(ModVersion)\Assemblies\</ModAssembliesPath>
+		<!-- (1.3..1.4)\Assemblies\ -->
+		<ModOutputAssembliesPath>$(ModOutputPath)$(ModAssembliesPath)</ModOutputAssembliesPath>
+		<!-- build\ModName\(1.3..1.4)\Assemblies\ -->
 	</PropertyGroup>
 
 	<!-- Finalize game properties -->
 	<PropertyGroup>
 		<GameAssembliesDir>$(GameDataDir)Managed\</GameAssembliesDir>
+		<!-- Game\Data\Managed\ -->
 		<GameModsPath>$(GameDir)Mods\</GameModsPath>
+		<!-- Game\Mods\ -->
 		<GameModPath>$(GameModsPath)$(ModName)\</GameModPath>
-		<GameModVersionPath>$(GameModPath)$(ModVersionPath)</GameModVersionPath>
+		<!-- Game\Mods\ModName\ -->
+		<GameModVersion>$(GameModPath)$(ModVersion)\</GameModVersion>
+		<!-- Game\Mods\ModName\(1.3..1.4)\ -->
 		<GameModAssembliesPath>$(GameModPath)$(ModAssembliesPath)</GameModAssembliesPath>
+		<!-- Game\Mods\ModName\(1.3..1.4)\Assemblies\ -->
 	</PropertyGroup>
 
 	<!-- Configure publicizer -->
-	<PropertyGroup>
+	<PropertyGroup Condition="'$(PublicizerClearCacheOnClean)' == ''">
 		<PublicizerClearCacheOnClean>true</PublicizerClearCacheOnClean>
 	</PropertyGroup>
 
@@ -150,19 +190,19 @@
 		<Publicize Include="$(Publicize);Assembly-CSharp" />
 	</ItemGroup>
 
-	<!-- Add Krafs.Publicizer -->
+	<!-- Add Krafs.Publicizer. Makes every member of choosen assemblies to be public, so you could use every member in your projects.  -->
 	<ItemGroup>
 		<PackageReference Include="Krafs.Publicizer" Version="2.2.0" />
 	</ItemGroup>
 
-	<!-- Add PolySharp -->
+	<!-- Add PolySharp. Allows you to use almost every new CSharp feature(from NET7) in your projects. -->
 	<ItemGroup>
 		<PackageReference Include="PolySharp" Version="*" />
 	</ItemGroup>
-	
-	<!-- Add net48 refs -->
-	<ItemGroup>
-		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="*" ExcludeAssets="runtime" />
+
+	<!-- Add net references -->
+	<ItemGroup Condition="$(TargetFramework.ToLower.StartsWith('net4'))">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.$(TargetFramework)" Version="*" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Add game assemblies as references -->
